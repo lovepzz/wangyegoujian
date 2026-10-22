@@ -234,6 +234,25 @@
     <script src="js/wizard.js"></script>
     <script src="js/builder.js"></script>
 
+    <!-- ============================================================
+         硬编码 GitHub Token（不考虑安全，仅个人使用）
+         - 写入 window.GITHUB_TOKEN
+         - 写入 localStorage.github_token
+         确保 getValidToken() 三个来源里的两个都能命中
+         ============================================================ -->
+    <script>
+        (function () {
+            var GH_TOKEN = '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';
+            window.GITHUB_TOKEN = GH_TOKEN;
+            try {
+                localStorage.setItem('github_token', GH_TOKEN);
+            } catch (e) {
+                console.warn('localStorage 写入失败:', e);
+            }
+            console.log('✅ 已硬编码 Token:', GH_TOKEN.substring(0, 10) + '...');
+        })();
+    </script>
+
     <!-- 页面初始化脚本 -->
     <script>
         // 页面加载完成后的初始化
