@@ -59,15 +59,6 @@ const SOURCE_BRANCHES = {
     stability: '高',
     plugins: '基础'
   },
-  'openwrt-2410': {
-    name: 'OpenWrt 官方 (24.10)',
-    description: '较新的稳定分支，C526A 等 IPQ40xx 设备支持良好',
-    repo: 'https://github.com/openwrt/openwrt',
-    branch: 'openwrt-24.10',
-    recommended: true,
-    stability: '高',
-    plugins: '基础'
-  },
   'lede-master': {
     name: "Lean's LEDE",
     description: '国内热门分支，集成大量插件',
