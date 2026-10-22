@@ -86,15 +86,6 @@ const SOURCE_BRANCHES = {
     stability: '中',
     plugins: '增强'
   },
-  'lienol-dev': {
-    name: 'Lienol (开发版)',
-    description: '功能激进，集成 Passwall 等插件，适合尝鲜用户',
-    repo: 'https://github.com/Lienol/openwrt',
-    branch: 'dev-master',
-    recommended: false,
-    stability: '中',
-    plugins: '丰富'
-  },
   'lienol-stable': {
     name: 'Lienol (稳定版)',
     description: '基于官方稳定版定制，注重稳定性与性能优化',
