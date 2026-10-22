@@ -51,10 +51,10 @@ function hasValidToken() {
 // ===== 源码分支配置（唯一一份，不重复声明） =====
 const SOURCE_BRANCHES = {
   'openwrt-main': {
-    name: 'OpenWrt 官方 (23.05)',
+    name: 'OpenWrt 官方 (25.12)',
     description: '最新稳定版本，兼容性最好',
     repo: 'https://github.com/openwrt/openwrt',
-    branch: 'openwrt-23.05',
+    branch: 'openwrt-25.12',
     recommended: true,
     stability: '高',
     plugins: '基础'
