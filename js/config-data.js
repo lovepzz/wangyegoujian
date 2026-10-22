@@ -4,49 +4,29 @@
  */
 
 // ===== 基础配置 =====
-// 请修改为你的GitHub仓库信息（这个可以公开）
 const GITHUB_REPO = 'lovepzz/wangyegoujian'; // 替换为你的仓库地址
 
-// ===== Token获取方式 =====
-// 1. 从URL参数获取（开发测试用）
-// 2. 从LocalStorage获取（用户输入存储）
-// 3. 从环境变量获取（GitHub Pages部署时）
-// 4. 从用户输入获取（安全输入框）
-
+// ===== Token 管理 =====
 let GITHUB_TOKEN = null;
 
-/**
- * 获取GitHub Token的安全方法
- */
 function getGitHubToken() {
-  // 方法1: 从URL参数获取（测试用，不推荐生产环境）
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlToken = urlParams.get('token');
-  if (urlToken) {
-    return urlToken;
-  }
+  // 1) URL 参数
+  const urlToken = new URLSearchParams(window.location.search).get('token');
+  if (urlToken) return urlToken;
 
-  // 方法2: 从LocalStorage获取（用户输入后存储）
-  const storedToken = localStorage.getItem('github_token');
-  if (storedToken) {
-    return storedToken;
-  }
+  // 2) localStorage
+  const stored = localStorage.getItem('github_token');
+  if (stored) return stored;
 
-  // 方法3: 从页面配置获取（动态设置）
-  if (window.GITHUB_TOKEN) {
-    return window.GITHUB_TOKEN;
-  }
+  // 3) window.GITHUB_TOKEN
+  if (window.GITHUB_TOKEN) return window.GITHUB_TOKEN;
 
   return null;
 }
 
-/**
- * 设置GitHub Token
- */
 function setGitHubToken(token) {
   if (token && token.trim()) {
     GITHUB_TOKEN = token.trim();
-    // 可选：存储到LocalStorage（注意安全性）
     if (confirm('是否保存Token到浏览器本地存储？\n（建议仅在个人设备上选择是）')) {
       localStorage.setItem('github_token', GITHUB_TOKEN);
     }
@@ -55,30 +35,35 @@ function setGitHubToken(token) {
   return false;
 }
 
-/**
- * 清除GitHub Token
- */
 function clearGitHubToken() {
   GITHUB_TOKEN = null;
   localStorage.removeItem('github_token');
   delete window.GITHUB_TOKEN;
 }
 
-/**
- * 检查是否有有效的Token
- */
+// ★ 修复：运算符优先级 bug，先判断 token 是否存在再 startsWith
 function hasValidToken() {
   const token = getGitHubToken();
-  return token && token.startsWith('ghp_') || token.startsWith('github_pat_');
+  if (!token) return false;
+  return token.startsWith('ghp_') || token.startsWith('github_pat_');
 }
 
-// ===== 源码分支配置 =====
+// ===== 源码分支配置（合并为唯一一份） =====
 const SOURCE_BRANCHES = {
   'openwrt-main': {
     name: 'OpenWrt 官方',
     description: '最新稳定版本，兼容性最好',
     repo: 'https://github.com/openwrt/openwrt',
     branch: 'openwrt-23.05',
+    recommended: true,
+    stability: '高',
+    plugins: '基础'
+  },
+  'openwrt-2410': {
+    name: 'OpenWrt 24.10',
+    description: '较新的稳定分支，适合 C526A 等 IPQ40xx 设备',
+    repo: 'https://github.com/openwrt/openwrt',
+    branch: 'openwrt-24.10',
     recommended: true,
     stability: '高',
     plugins: '基础'
@@ -100,16 +85,11 @@ const SOURCE_BRANCHES = {
     recommended: false,
     stability: '中',
     plugins: '增强'
-  }
-};
-// ===== 源码分支配置 =====
-const SOURCE_BRANCHES = {
-  // ... 原有的 openwrt-main, lede-master, immortalwrt-master 配置保持不变
-  
-  // 👇 新增 Lienol 源码分支
+  },
+  // ★ 新增 Lienol 源码分支
   'lienol-dev': {
     name: 'Lienol (开发版)',
-    description: '功能激进，集成Passwall等插件，适合喜欢尝鲜的用户',
+    description: '功能激进，集成 Passwall 等插件，适合尝鲜用户',
     repo: 'https://github.com/Lienol/openwrt',
     branch: 'dev-master',
     recommended: false,
@@ -120,7 +100,7 @@ const SOURCE_BRANCHES = {
     name: 'Lienol (稳定版)',
     description: '基于官方稳定版定制，注重稳定性与性能优化',
     repo: 'https://github.com/Lienol/openwrt',
-    branch: 'dev-19.07', // 注意：这是较旧的稳定分支，建议确认最新稳定分支名
+    branch: '21.02', // 建议去 GitHub 确认最新稳定分支名
     recommended: true,
     stability: '高',
     plugins: '基础'
@@ -129,6 +109,19 @@ const SOURCE_BRANCHES = {
 
 // ===== 设备配置 =====
 const DEVICE_CONFIGS = {
+  // ★ 极路由X / HiWiFi C526A
+  'hiwifi_c526a': {
+    name: 'HiWiFi C526A (极路由X)',
+    category: 'router',
+    arch: 'ipq40xx',
+    target: 'ipq40xx/generic',
+    profile: 'hiwifi_c526a',
+    flash_size: '128M',
+    ram_size: '512M',
+    recommended: false,
+    features: ['wifi', 'gigabit', 'usb', 'tri-band']
+  },
+
   // 路由器设备
   'xiaomi_4a_gigabit': {
     name: '小米路由器4A千兆版',
@@ -163,7 +156,8 @@ const DEVICE_CONFIGS = {
     recommended: false,
     features: ['wifi', 'gigabit']
   },
-  // ARM设备
+
+  // ARM 设备
   'rpi_4b': {
     name: '树莓派4B',
     category: 'arm',
@@ -186,7 +180,8 @@ const DEVICE_CONFIGS = {
     recommended: true,
     features: ['gigabit', 'dual_ethernet']
   },
-  // X86设备
+
+  // X86 设备
   'x86_64': {
     name: 'X86 64位 (通用)',
     category: 'x86',
@@ -213,7 +208,6 @@ const DEVICE_CONFIGS = {
 
 // ===== 插件配置 =====
 const PLUGIN_CONFIGS = {
-  // 网络代理类
   proxy: {
     name: '🔐 网络代理',
     plugins: {
@@ -242,7 +236,6 @@ const PLUGIN_CONFIGS = {
     }
   },
 
-  // 网络工具类
   network: {
     name: '🌐 网络工具',
     plugins: {
@@ -275,7 +268,6 @@ const PLUGIN_CONFIGS = {
     }
   },
 
-  // 系统管理类
   system: {
     name: '⚙️ 系统管理',
     plugins: {
@@ -308,7 +300,6 @@ const PLUGIN_CONFIGS = {
     }
   },
 
-  // 多媒体服务类
   media: {
     name: '🎵 多媒体服务',
     plugins: {
@@ -343,33 +334,29 @@ const PLUGIN_CONFIGS = {
 
 // ===== 冲突检测规则 =====
 const CONFLICT_RULES = {
-  // 代理软件互斥
   proxy_mutual_exclusive: [
     ['luci-app-ssr-plus', 'luci-app-passwall', 'luci-app-openclash']
   ],
 
-  // 广告拦截互斥
   adblock_mutual_exclusive: [
     ['luci-app-adguardhome', 'luci-app-adbyby-plus']
   ],
 
-  // 下载工具互斥
   download_mutual_exclusive: [
     ['luci-app-transmission', 'luci-app-qbittorrent']
   ],
 
-  // 架构限制
   arch_restrictions: {
     'luci-app-dockerman': ['x86', 'arm64'],
     'luci-app-kvm': ['x86']
   },
 
-  // 存储空间限制（单位：MB）
   storage_limits: {
-    '8M': 2,    // 8MB Flash最多选2个插件
-    '16M': 5,   // 16MB Flash最多选5个插件
-    '32M': 10,  // 32MB Flash最多选10个插件
-    'SD': 50    // SD卡几乎无限制
+    '8M': 2,
+    '16M': 5,
+    '32M': 10,
+    '128M': 30, // ★ C526A
+    'SD': 50
   }
 };
 
@@ -420,9 +407,6 @@ const BUILD_OPTIONS = {
 
 // ===== 工具函数 =====
 
-/**
- * 获取设备推荐配置
- */
 function getDeviceRecommendedConfig(deviceId) {
   const device = DEVICE_CONFIGS[deviceId];
   if (!device) return null;
@@ -435,13 +419,9 @@ function getDeviceRecommendedConfig(deviceId) {
   };
 }
 
-/**
- * 获取推荐插件
- */
 function getRecommendedPlugins(device) {
   const recommended = [];
 
-  // 根据设备类型推荐基础插件
   if (device.features?.includes('wifi')) {
     recommended.push('luci-app-ddns');
   }
@@ -457,21 +437,15 @@ function getRecommendedPlugins(device) {
   return recommended;
 }
 
-/**
- * 获取推荐优化选项
- */
 function getRecommendedOptimization(device) {
   if (device.flash_size === '8M' || device.flash_size === '16M') {
-    return 'size'; // 体积优化
+    return 'size';
   } else if (device.category === 'x86') {
-    return 'performance'; // 性能优化
+    return 'performance';
   }
-  return 'balanced'; // 平衡模式
+  return 'balanced';
 }
 
-/**
- * 获取设备警告信息
- */
 function getDeviceWarnings(device) {
   const warnings = [];
 
@@ -490,13 +464,9 @@ function getDeviceWarnings(device) {
   return warnings;
 }
 
-/**
- * 检测插件冲突
- */
 function detectPluginConflicts(selectedPlugins) {
   const conflicts = [];
 
-  // 检查互斥插件
   Object.entries(CONFLICT_RULES).forEach(([ruleName, rules]) => {
     if (ruleName.includes('mutual_exclusive')) {
       rules.forEach(group => {
@@ -518,9 +488,6 @@ function detectPluginConflicts(selectedPlugins) {
   return conflicts;
 }
 
-/**
- * 检查架构兼容性
- */
 function checkArchCompatibility(selectedPlugins, deviceArch) {
   const incompatible = [];
 
@@ -538,7 +505,7 @@ function checkArchCompatibility(selectedPlugins, deviceArch) {
   return incompatible;
 }
 
-// 导出全局变量（用于其他脚本调用）
+// ===== 导出到 window =====
 window.GITHUB_REPO = GITHUB_REPO;
 window.getGitHubToken = getGitHubToken;
 window.setGitHubToken = setGitHubToken;
@@ -550,7 +517,6 @@ window.PLUGIN_CONFIGS = PLUGIN_CONFIGS;
 window.CONFLICT_RULES = CONFLICT_RULES;
 window.BUILD_OPTIONS = BUILD_OPTIONS;
 
-// 导出工具函数
 window.getDeviceRecommendedConfig = getDeviceRecommendedConfig;
 window.detectPluginConflicts = detectPluginConflicts;
 window.checkArchCompatibility = checkArchCompatibility;
