@@ -102,6 +102,30 @@ const SOURCE_BRANCHES = {
     plugins: '增强'
   }
 };
+// ===== 源码分支配置 =====
+const SOURCE_BRANCHES = {
+  // ... 原有的 openwrt-main, lede-master, immortalwrt-master 配置保持不变
+  
+  // 👇 新增 Lienol 源码分支
+  'lienol-dev': {
+    name: 'Lienol (开发版)',
+    description: '功能激进，集成Passwall等插件，适合喜欢尝鲜的用户',
+    repo: 'https://github.com/Lienol/openwrt',
+    branch: 'dev-master',
+    recommended: false,
+    stability: '中',
+    plugins: '丰富'
+  },
+  'lienol-stable': {
+    name: 'Lienol (稳定版)',
+    description: '基于官方稳定版定制，注重稳定性与性能优化',
+    repo: 'https://github.com/Lienol/openwrt',
+    branch: 'dev-19.07', // 注意：这是较旧的稳定分支，建议确认最新稳定分支名
+    recommended: true,
+    stability: '高',
+    plugins: '基础'
+  }
+};
 
 // ===== 设备配置 =====
 const DEVICE_CONFIGS = {
