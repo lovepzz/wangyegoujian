@@ -41,17 +41,17 @@ function clearGitHubToken() {
   delete window.GITHUB_TOKEN;
 }
 
-// ★ 修复：运算符优先级 bug，先判断 token 是否存在再 startsWith
+// 修复运算符优先级 bug
 function hasValidToken() {
   const token = getGitHubToken();
   if (!token) return false;
   return token.startsWith('ghp_') || token.startsWith('github_pat_');
 }
 
-// ===== 源码分支配置（合并为唯一一份） =====
+// ===== 源码分支配置（唯一一份，不重复声明） =====
 const SOURCE_BRANCHES = {
   'openwrt-main': {
-    name: 'OpenWrt 官方',
+    name: 'OpenWrt 官方 (23.05)',
     description: '最新稳定版本，兼容性最好',
     repo: 'https://github.com/openwrt/openwrt',
     branch: 'openwrt-23.05',
@@ -60,8 +60,8 @@ const SOURCE_BRANCHES = {
     plugins: '基础'
   },
   'openwrt-2410': {
-    name: 'OpenWrt 24.10',
-    description: '较新的稳定分支，适合 C526A 等 IPQ40xx 设备',
+    name: 'OpenWrt 官方 (24.10)',
+    description: '较新的稳定分支，C526A 等 IPQ40xx 设备支持良好',
     repo: 'https://github.com/openwrt/openwrt',
     branch: 'openwrt-24.10',
     recommended: true,
@@ -86,7 +86,6 @@ const SOURCE_BRANCHES = {
     stability: '中',
     plugins: '增强'
   },
-  // ★ 新增 Lienol 源码分支
   'lienol-dev': {
     name: 'Lienol (开发版)',
     description: '功能激进，集成 Passwall 等插件，适合尝鲜用户',
@@ -100,7 +99,7 @@ const SOURCE_BRANCHES = {
     name: 'Lienol (稳定版)',
     description: '基于官方稳定版定制，注重稳定性与性能优化',
     repo: 'https://github.com/Lienol/openwrt',
-    branch: '21.02', // 建议去 GitHub 确认最新稳定分支名
+    branch: '21.02',
     recommended: true,
     stability: '高',
     plugins: '基础'
@@ -109,7 +108,7 @@ const SOURCE_BRANCHES = {
 
 // ===== 设备配置 =====
 const DEVICE_CONFIGS = {
-  // ★ 极路由X / HiWiFi C526A
+  // 极路由X / HiWiFi C526A
   'hiwifi_c526a': {
     name: 'HiWiFi C526A (极路由X)',
     category: 'router',
@@ -355,7 +354,7 @@ const CONFLICT_RULES = {
     '8M': 2,
     '16M': 5,
     '32M': 10,
-    '128M': 30, // ★ C526A
+    '128M': 30,   // C526A
     'SD': 50
   }
 };
